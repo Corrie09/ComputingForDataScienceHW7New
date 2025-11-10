@@ -48,6 +48,34 @@ class PatientData(BaseModel):
     )
 
 
+# --- Root endpoint for health check --- Confirms API is running
+@app.get("/")
+def read_root():
+    return {"message": "Diabetes Prediction API is running."}
+
+
+# --- Health check endpoint --- Used in production to detect downtime
+@app.get("/health")
+def health_check():
+    return {"status": "healthy"}  # useful for monitoring systems
+
+
+# --- Model info endpoint --- helpful for debugging and documentation
+@app.get("/model_info")
+def model_info():
+    return {
+        "model_type": type(model).__name__,  # e.g., "RandomForestClassifier
+        "model_path": model_path,  # path to the model file
+        "input_schema": PatientData.schema(),  # Pydantic schema of expected input
+        "features": list(model.feature_names_in_)
+        if hasattr(model, "feature_names_in_")
+        else "N/A",  # list of feature names
+        "n_features": len(model.feature_names_in_)
+        if hasattr(model, "feature_names_in_")
+        else "N/A",  # number of features
+    }
+
+
 # --- Define the prediction endpoint ---
 # @app.post("/predict") is a decorator that tells FastAPI: "When someone sends a POST request to /predict, run this function"
 @app.post("/predict")
