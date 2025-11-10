@@ -1,20 +1,29 @@
 # api_model.py
-from fastapi import FastAPI, HTTPException
-from pydantic import BaseModel
+import os
+
 import joblib
 import pandas as pd
-import os
+from fastapi import FastAPI, HTTPException
+from pydantic import BaseModel
 
 # Load model trained on the 10 FEATURES only
 model_path = os.path.join(os.path.dirname(__file__), "model.pkl")
-model = joblib.load(model_path)
+# gets the directory where api_model.py lives and builds the full path to model.pkl in that same directory
+try:
+    model = joblib.load(model_path)  # loads the trained model from the model.pkl file
+except FileNotFoundError:
+    raise FileNotFoundError(
+        f"Model file not found at {model_path}. Please ensure the model.pkl file is in the correct location."
+    )
+
 
 # --- Initialize the API ---
 app = FastAPI(
     title="Diabetes Prediction API",
     description="API that serves a trained ML model for predicting diabetes mellitus",
-    version="1.0"
+    version="1.0",
 )
+
 
 # --- Define the expected input schema ---
 class PatientData(BaseModel):
