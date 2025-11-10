@@ -1,4 +1,5 @@
 # api_model.py
+import logging  # For logging errors and information
 import os
 
 import joblib
@@ -90,4 +91,5 @@ def predict(data: PatientData):  # function receives data of type PatientData
             return {"prediction": float(pred)}  # return as float for JSON serialization
 
     except Exception as e:
+        logging.error(f"Prediction error: {e}")  # Log the error for debugging
         raise HTTPException(status_code=500, detail=str(e))
